@@ -6,3 +6,13 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.fountainhead-ribbon-class {
+  color: tomato;
+}
+
+.fountainhead-ribbon-class:hover {
+  background: tomato;
+  /*border-radius: 8px;*/
+  color: white;
+}

@@ -15,28 +15,21 @@ export class FountainheadSettingsTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'Fountainhead Settings' });
 
     new Setting(containerEl)
-      .setName('Is it cool?')
-      .setDesc('Probably ¯\\_(ツ)_/¯')
-      .addToggle(toggle =>
-        toggle
-          .setTooltip('You know what to do')
-          .setValue(this.plugin.settings.isCool)
+      .setName('Fountainhead Project Folder')
+      .setDesc('A folder path in your vault')
+      .addText(text =>
+        text
+          .setPlaceholder('MyProject/')
+          .setValue(this.plugin.settings.projectDirectory)
           .onChange(async value => {
-            this.plugin.settings.isCool = value;
+            this.plugin.settings.projectDirectory = value;
             await this.plugin.saveSettings();
           }),
       );
 
     new Setting(containerEl)
-      .setName('This one\'s boring')
-      .setDesc('See?')
-      .addText(text =>
-        text.setPlaceholder('Type stuff dummy')
-          .setValue(this.plugin.settings.testString)
-          .onChange(async value => {
-            this.plugin.settings.testString = value;
-            await this.plugin.saveSettings();
-          })
-      );
+      .setName('Initialize Project')
+      .setDesc("Create settings file in project folder if it doesn't exist")
+      .addButton(btn => btn.setButtonText('Initialize'));
   }
 }

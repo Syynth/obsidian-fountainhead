@@ -32,6 +32,7 @@ esbuild.build({
 		'@lezer/highlight',
 		'@lezer/lr',
 		...builtins],
+  jsx: 'automatic',
 	format: 'cjs',
 	watch: !prod,
 	target: 'es2018',
@@ -39,4 +40,7 @@ esbuild.build({
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
 	outfile: 'main.js',
-}).catch(() => process.exit(1));
+}).catch((err) => {
+  console.error(err);
+  return process.exit(1);
+});

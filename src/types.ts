@@ -1,4 +1,11 @@
 export interface FountainheadSettings {
-  isCool: boolean;
-  testString: string;
+  projectDirectory: string;
+}
+
+export type Opaque<T extends string> = T & { __opaque: T };
+
+export type FileId = Opaque<string>;
+
+export function cast<T>(arg: any): T {
+  return arg;
 }

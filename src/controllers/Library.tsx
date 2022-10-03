@@ -12,7 +12,6 @@ export class Library extends ViewController<typeof LIBRARY_VIEW_TYPE> {
   }
 
   viewCreator = (leaf: WorkspaceLeaf) => {
-    console.log('registering view', this.viewType);
     return (this.view = new ReactItemView({
       leaf,
       plugin: this.plugin,

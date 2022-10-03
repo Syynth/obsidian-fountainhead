@@ -1,10 +1,11 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { FountainheadPlugin } from '~/FountainheadPlugin';
 import { FunctionComponent, StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { unmountComponentAtNode } from 'react-dom';
+import { createRoot, Root } from 'react-dom/client';
+import { ChakraProvider } from '@chakra-ui/react';
 import { ErrorView } from '~/components/ErrorView';
 import { FountainheadProvider } from '~/hooks/app';
+import { theme } from '~/theme';
 
 export class ViewController<T extends string> {
   readonly plugin: FountainheadPlugin;
@@ -17,10 +18,9 @@ export class ViewController<T extends string> {
   }
 
   async activateView() {
-    // if (!this.view) return;
     this.plugin.app.workspace.detachLeavesOfType(this.viewType);
 
-    await this.plugin.app.workspace.getLeftLeaf(false).setViewState({
+    await this.plugin.app.workspace.getLeaf(false).setViewState({
       type: this.viewType,
       active: true,
     });
@@ -48,6 +48,7 @@ export class ReactItemView<T extends string> extends ItemView {
   readonly viewType: T;
   readonly displayText: string;
   readonly Component: FunctionComponent;
+  root: Root;
 
   constructor({ leaf, ...config }: ViewConfig<T>) {
     super(leaf);
@@ -64,19 +65,21 @@ export class ReactItemView<T extends string> extends ItemView {
 
   async onOpen() {
     const { Component, plugin } = this;
-    const root = createRoot(this.containerEl.children[1]);
-    root.render(
+    this.root = createRoot(this.containerEl.children[1]);
+    this.root.render(
       <StrictMode>
-        <FountainheadProvider plugin={plugin}>
-          <ErrorView>
-            <Component />
-          </ErrorView>
-        </FountainheadProvider>
+        <ChakraProvider theme={theme}>
+          <FountainheadProvider plugin={plugin}>
+            <ErrorView>
+              <Component />
+            </ErrorView>
+          </FountainheadProvider>
+        </ChakraProvider>
       </StrictMode>,
     );
   }
 
   async onClose() {
-    unmountComponentAtNode(this.containerEl.children[1]);
+    this.root.unmount();
   }
 }

@@ -8,6 +8,13 @@ const config = {
   config: {
     initialColorMode: 'dark',
   },
+  styles: {
+    global: {
+      svg: {
+        display: 'initial'
+      }
+    }
+  }
 };
 
 export const theme = extendTheme(
@@ -21,5 +28,3 @@ export const theme = extendTheme(
     components: ['Button', 'Tabs', 'Input', 'Checkbox'],
   }),
 );
-
-delete theme.styles.global;

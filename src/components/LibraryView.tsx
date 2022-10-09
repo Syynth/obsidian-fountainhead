@@ -1,8 +1,9 @@
 import validator from '@rjsf/validator-ajv6';
 import Form from '@rjsf/chakra-ui';
-import { CharacterSchema, CharacterUISchema } from '~/schemas/character';
+import {CharacterSchema, CharacterUISchema} from '~/schemas/character';
 import {
   Button,
+  Divider,
   HStack,
   Tab,
   TabList,
@@ -33,19 +34,16 @@ export function LibraryView() {
               minW={64}
             >
               <VStack spacing={4} align="stretch">
+                <Button mt="auto">Add New</Button>
+                <Divider />
                 <Button>Minnie</Button>
                 <Button>Solstice</Button>
                 <Button>Lala</Button>
-              </VStack>
-              <VStack align="stretch">
-                <Button mt="auto">Add New</Button>
               </VStack>
             </VStack>
             <VStack
               px={4}
               pb={4}
-              overflowY="scroll"
-              maxH="80vh"
               flex="1"
               align="stretch"
               sx={{

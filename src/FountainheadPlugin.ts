@@ -1,4 +1,4 @@
-import { Notice, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import { FountainheadSettings } from '~/types';
 import { DEFAULT_SETTINGS } from '~/constants';
 import { FountainheadSettingsTab } from '~/controllers/Settings';
@@ -27,7 +27,6 @@ export class FountainheadPlugin extends Plugin {
       'Fountainhead',
       async () => {
         // Called when the user clicks the icon.
-        new Notice('This will open the fountainhead project manager');
         const lib = this.controllers.find(ctrl => ctrl instanceof Library);
         await lib?.activateView();
       },

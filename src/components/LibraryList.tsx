@@ -6,7 +6,7 @@ import { FountainheadPlugin } from '~/FountainheadPlugin';
 
 interface LibraryListProps {
   resource: 'Characters';
-
+  active: string | null;
   onSelect(path: string): void;
 }
 
@@ -17,18 +17,26 @@ async function getResources(plugin: FountainheadPlugin, resource: string) {
   return files.filter(file => file.endsWith('md'));
 }
 
-export function LibraryList({ resource, onSelect }: LibraryListProps) {
+export function LibraryList({ resource, active, onSelect }: LibraryListProps) {
   const vault = useVault();
   const plugin = usePlugin();
   const [items, setItems] = useState<string[]>([]);
   const [pending, setPending] = useState(true);
+  const [firstLoad, setFirstLoad] = useState(true);
 
   useEffect(() => {
     (async () => {
-      setItems(await getResources(plugin, resource));
+      const items = (await getResources(plugin, resource)).map(item =>
+        item.replace('//', '/'),
+      );
+      setItems(items);
       setPending(false);
+      if (firstLoad) {
+        setFirstLoad(false);
+        onSelect(items[0] ?? null);
+      }
     })();
-  }, [plugin]);
+  }, [plugin, firstLoad, onSelect]);
 
   useEffect(() => {
     async function handler() {
@@ -56,7 +64,11 @@ export function LibraryList({ resource, onSelect }: LibraryListProps) {
   ) : (
     <>
       {items.map(item => (
-        <Button onClick={() => onSelect(item.replace('//', '/'))} key={item}>
+        <Button
+          variant={item === active ? undefined : 'outline'}
+          onClick={() => onSelect(item)}
+          key={item}
+        >
           {prettyName(item)}
         </Button>
       ))}

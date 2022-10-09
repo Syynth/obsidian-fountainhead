@@ -134,11 +134,19 @@ ${stringifyYaml({
               minW={64}
             >
               <VStack spacing={4} align="stretch">
-                <Button onClick={() => startEditing(null)} mt="auto">
+                <Button
+                  variant={editing === null ? undefined : 'outline'}
+                  onClick={() => startEditing(null)}
+                  mt="auto"
+                >
                   Add New
                 </Button>
                 <Divider />
-                <LibraryList onSelect={startEditing} resource="Characters" />
+                <LibraryList
+                  active={editing}
+                  onSelect={startEditing}
+                  resource="Characters"
+                />
               </VStack>
             </VStack>
             <VStack

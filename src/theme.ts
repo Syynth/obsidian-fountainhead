@@ -4,6 +4,8 @@ import {
   withDefaultSize,
 } from '@chakra-ui/react';
 
+import { getOS } from '~/fs/utils';
+
 const config = {
   config: {
     initialColorMode: 'dark',
@@ -11,10 +13,10 @@ const config = {
   styles: {
     global: {
       svg: {
-        display: 'initial'
-      }
-    }
-  }
+        display: 'initial',
+      },
+    },
+  },
 };
 
 export const theme = extendTheme(
@@ -28,3 +30,12 @@ export const theme = extendTheme(
     components: ['Button', 'Tabs', 'Input', 'Checkbox'],
   }),
 );
+
+if (getOS() === 'Apple') {
+  delete theme.styles.global;
+  theme.styles.global = {
+    svg: {
+      display: 'initial',
+    },
+  };
+}

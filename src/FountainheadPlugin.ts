@@ -49,8 +49,13 @@ export class FountainheadPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = { ...DEFAULT_SETTINGS, ...(await this.loadData()) };
+    this.settings = {
+      ...DEFAULT_SETTINGS,
+      ...(await this.loadData()),
+    };
 
+    this.settings.collections =
+      this.settings.collections?.filter(str => str) ?? [];
     this.addSettingTab(new FountainheadSettingsTab(this.app, this));
   }
 

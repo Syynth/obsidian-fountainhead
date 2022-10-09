@@ -13,6 +13,7 @@ export class FountainheadSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
     containerEl.createEl('h2', { text: 'Fountainhead Settings' });
+    const { settings } = this.plugin;
 
     new Setting(containerEl)
       .setName('Fountainhead Project Folder')
@@ -20,9 +21,9 @@ export class FountainheadSettingsTab extends PluginSettingTab {
       .addText(text =>
         text
           .setPlaceholder('MyProject/')
-          .setValue(this.plugin.settings.projectDirectory)
+          .setValue(settings.projectDirectory)
           .onChange(async value => {
-            this.plugin.settings.projectDirectory = value;
+            settings.projectDirectory = value;
             await this.plugin.saveSettings();
           }),
       );
@@ -34,6 +35,23 @@ export class FountainheadSettingsTab extends PluginSettingTab {
         btn
           .setButtonText('Initialize')
           .onClick(() => this.plugin.createLibrary()),
+      );
+
+    new Setting(containerEl)
+      .setName('Library Schemas')
+      .setDesc('Comma separated list of schema names')
+      .addTextArea(text =>
+        text
+          .setPlaceholder('Characters, Locations, Factions')
+          .setValue(settings.collections?.join?.(', ') ?? '')
+          .onChange(async value => {
+            this.plugin.settings.collections =
+              value
+                ?.trim()
+                .split(',')
+                .map(col => col.trim()) ?? [];
+            await this.plugin.saveSettings();
+          }),
       );
   }
 }

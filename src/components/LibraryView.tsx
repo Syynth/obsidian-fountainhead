@@ -25,8 +25,7 @@ export function LibraryView() {
   const plugin = usePlugin();
   const [editing, setEditing] = useState<null | string>(null);
 
-  async function handleSubmit({ formData }: IChangeEvent<any, any>) {
-    // event: React.FormEvent<any>,
+  async function handleSubmit({ formData }: IChangeEvent) {
     const path =
       `${plugin.settings.projectDirectory}/Library/Characters/${formData.details.fullName}.md`.replace(
         '//',
@@ -48,7 +47,6 @@ ${stringifyYaml({
       const text = await vault.adapter.read(editing);
       const files = vault.getMarkdownFiles();
       const file = files.find(file => file.path === editing);
-      console.log(file, files, path, editing);
       let hasNameChange = false;
       await vault.modify(
         file!,

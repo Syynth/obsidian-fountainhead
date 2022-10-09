@@ -6,4 +6,5 @@ export const EXPLORER_VIEW_TYPE = 'STATUS92/EXPLORER_VIEW';
 
 export const DEFAULT_SETTINGS: FountainheadSettings = {
   projectDirectory: 'Fountainhead/',
+  collections: ['Characters'],
 };

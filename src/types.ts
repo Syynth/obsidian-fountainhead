@@ -1,5 +1,6 @@
 export interface FountainheadSettings {
   projectDirectory: string;
+  collections: string[];
 }
 
 export type Opaque<T extends string> = T & { __opaque: T };

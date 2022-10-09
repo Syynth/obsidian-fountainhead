@@ -11,6 +11,7 @@ async function getResources(vault: Vault, dir: string) {
   const { files } = await vault.adapter.list(dir);
   return files
     .filter(file => file.endsWith('md'))
+    .filter(file => !file.endsWith('Schema.md'))
     .map(file => file.replace('//', '/'));
 }
 

@@ -67,20 +67,35 @@ export class FountainheadPlugin extends Plugin {
     const { projectDirectory } = this.settings;
     const { vault } = this.app;
 
-    await createFolder(vault, projectDirectory + '/Library/Characters');
     await createFolder(vault, projectDirectory + '/Script');
+    await createFolder(vault, projectDirectory + '/Library');
 
-    await createFile(
-      vault,
-      projectDirectory + '/Library/Characters/.index',
-      `
----
+    for (const collection of this.settings.collections) {
+      const dir = projectDirectory + '/Library/' + collection;
+      await createFolder(vault, dir);
+      await createFile(
+        vault,
+        dir + '/0. Schema.md',
+        `---
 tags: [library-index]
 fountainhead:
   resource: Index
-  type: Character-Index
----`,
-    );
+  type: ${collection}-Index
+---
+\`\`\`json5
+{
+  type: 'object',
+  title: "${collection}",
+  properties: {
+    name: {
+      title: 'Record Name',
+      type: 'string',
+    },
+  },
+}
+\`\`\``,
+      );
+    }
   }
 
   async handlePostProcessing() {}

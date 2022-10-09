@@ -15,9 +15,9 @@ import {
 import { IChangeEvent } from '@rjsf/core';
 import { usePlugin, useVault } from '~/hooks/app';
 import { createFile } from '~/fs/utils';
-import { Notice, parseYaml, stringifyYaml } from 'obsidian';
+import { Notice, parseYaml, stringifyYaml, TAbstractFile } from 'obsidian';
 import { LibraryList } from '~/components/LibraryList';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { findFrontmatter, replaceFrontmatter } from '~/utils';
 
 export function LibraryView() {
@@ -74,6 +74,28 @@ ${stringifyYaml({
       new Notice('Updated record');
     }
   }
+
+  const loadFile = useCallback(
+    async (path: string) => {
+      const text = await vault.adapter.read(path);
+      setFormData(parseYaml(findFrontmatter(text))?.fountainhead?.data ?? {});
+      setEditing(path);
+    },
+    [vault],
+  );
+
+  useEffect(() => {
+    async function handler(file: TAbstractFile) {
+      if (editing === file.path) {
+        await loadFile(file.path);
+      }
+    }
+
+    vault.on('modify', handler);
+    return () => {
+      vault.off('modify', handler);
+    };
+  }, [vault, loadFile, editing]);
 
   async function startEditing(next: null | string) {
     if (next === null) {

@@ -4,6 +4,7 @@ import { DEFAULT_SETTINGS } from '~/constants';
 import { FountainheadSettingsTab } from '~/controllers/Settings';
 import { Library } from '~/controllers/Library';
 import { ViewController } from '~/controllers/ReactItemView';
+import { createFile, createFolder } from '~/fs/utils';
 
 export class FountainheadPlugin extends Plugin {
   settings: FountainheadSettings;
@@ -55,6 +56,26 @@ export class FountainheadPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+
+  async createLibrary() {
+    const { projectDirectory } = this.settings;
+    const { vault } = this.app;
+
+    await createFolder(vault, projectDirectory + '/Library/Characters');
+    await createFolder(vault, projectDirectory + '/Script');
+
+    await createFile(
+      vault,
+      projectDirectory + '/Library/Characters/.index',
+      `
+---
+tags: [library-index]
+fountainhead:
+  resource: Index
+  type: Character-Index
+---`,
+    );
   }
 
   async handlePostProcessing() {}

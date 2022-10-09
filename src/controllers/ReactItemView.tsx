@@ -69,7 +69,7 @@ export class ReactItemView<T extends string> extends ItemView {
     this.root.render(
       <StrictMode>
         <ChakraProvider theme={theme}>
-          <FountainheadProvider plugin={plugin}>
+          <FountainheadProvider app={this.app} plugin={plugin}>
             <ErrorView>
               <Component />
             </ErrorView>

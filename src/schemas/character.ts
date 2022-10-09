@@ -1,10 +1,13 @@
 import { JSONSchema7 } from 'json-schema';
-import { versionProperty, logProperty } from '~/schemas/utils';
+import { logProperty, versionProperty } from '~/schemas/utils';
 
 export const CharacterSchema: JSONSchema7 = {
-  // title: 'Character Entry',
   type: 'object',
   properties: {
+    name: {
+      title: 'Record Name',
+      type: 'string',
+    },
     details: {
       title: 'Character Details',
       type: 'object',

@@ -30,6 +30,10 @@ export class FountainheadSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName('Initialize Project')
       .setDesc("Create settings file in project folder if it doesn't exist")
-      .addButton(btn => btn.setButtonText('Initialize'));
+      .addButton(btn =>
+        btn
+          .setButtonText('Initialize')
+          .onClick(() => this.plugin.createLibrary()),
+      );
   }
 }

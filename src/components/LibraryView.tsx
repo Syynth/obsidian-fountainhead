@@ -15,7 +15,7 @@ import {
 import { IChangeEvent } from '@rjsf/core';
 import { usePlugin, useVault } from '~/hooks/app';
 import { createFile } from '~/fs/utils';
-import { parseYaml, stringifyYaml } from 'obsidian';
+import { Notice, parseYaml, stringifyYaml } from 'obsidian';
 import { LibraryList } from '~/components/LibraryList';
 import { useState } from 'react';
 import { findFrontmatter, replaceFrontmatter } from '~/utils';
@@ -27,7 +27,11 @@ export function LibraryView() {
 
   async function handleSubmit({ formData }: IChangeEvent<any, any>) {
     // event: React.FormEvent<any>,
-    const path = `${plugin.settings.projectDirectory}/Library/Characters/${formData.details.fullName}.md`;
+    const path =
+      `${plugin.settings.projectDirectory}/Library/Characters/${formData.details.fullName}.md`.replace(
+        '//',
+        '/',
+      );
     if (!editing) {
       await createFile(
         vault,
@@ -44,6 +48,7 @@ ${stringifyYaml({
       const text = await vault.adapter.read(editing);
       const files = vault.getMarkdownFiles();
       const file = files.find(file => file.path === editing);
+      console.log(file, files, path, editing);
       let hasNameChange = false;
       await vault.modify(
         file!,
@@ -60,10 +65,13 @@ ${stringifyYaml({
             },
           };
         }),
+        {},
       );
       if (hasNameChange && !(await vault.adapter.exists(path))) {
-        await vault.rename(file!, path);
+        await plugin.app.fileManager.renameFile(file!, path);
+        setEditing(path);
       }
+      new Notice('Updated record');
     }
   }
 
@@ -128,6 +136,7 @@ ${stringifyYaml({
                 },
               }}
             >
+              <pre>Editing: {editing}</pre>
               <Form
                 onChange={handleChange}
                 formData={formData}

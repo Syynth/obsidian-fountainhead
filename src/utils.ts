@@ -1,5 +1,11 @@
 import { parseYaml, stringifyYaml } from 'obsidian';
 
+export async function sleep(ms: number = 0) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export function findFrontmatter(text: string) {
   const lines = text.trim().split('\n');
   let started = false;
@@ -63,8 +69,10 @@ export function replaceFrontmatter(text: string, get: (current: any) => any) {
   return [
     before,
     '---',
-    stringifyYaml(get(parseYaml(frontmatter))),
+    stringifyYaml(get(parseYaml(frontmatter))).trim(),
     '---',
     after,
-  ].join('\n');
+  ]
+    .join('\n')
+    .trim();
 }

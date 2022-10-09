@@ -56,7 +56,7 @@ export function LibraryList({ resource, onSelect }: LibraryListProps) {
   ) : (
     <>
       {items.map(item => (
-        <Button onClick={() => onSelect(item)} key={item}>
+        <Button onClick={() => onSelect(item.replace('//', '/'))} key={item}>
           {prettyName(item)}
         </Button>
       ))}

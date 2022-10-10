@@ -24,7 +24,7 @@ export class ViewController<T extends string> {
     this.leafType = leafType;
   }
 
-  async activateView() {
+  async enableView() {
     const { workspace } = this.plugin.app;
     workspace.detachLeavesOfType(this.viewType);
 
@@ -44,7 +44,12 @@ export class ViewController<T extends string> {
       type: this.viewType,
       active: true,
     });
+    return this;
+  }
 
+  async activateView() {
+    const { workspace } = this.plugin.app;
+    await this.enableView();
     workspace.revealLeaf(workspace.getLeavesOfType(this.viewType)[0]);
     return this;
   }

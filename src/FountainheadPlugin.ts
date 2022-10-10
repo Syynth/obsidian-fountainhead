@@ -6,6 +6,7 @@ import { Library } from '~/controllers/Library';
 import { ViewController } from '~/controllers/ReactItemView';
 import { createFile, createFolder } from '~/fs/utils';
 import { schema } from '~/fs/templates';
+import { Explorer } from '~/controllers/Explorer';
 
 export class FountainheadPlugin extends Plugin {
   settings: FountainheadSettings;
@@ -46,8 +47,10 @@ export class FountainheadPlugin extends Plugin {
     const statusBarItemEl = this.addStatusBarItem();
     statusBarItemEl.setText('Parenthetical');
 
-    this.controllers.push(new Library(this));
-    // this.controllers.push(await new Explorer(this).activateView());
+    this.app.workspace.onLayoutReady(async () => {
+      this.controllers.push(new Library(this));
+      this.controllers.push(await new Explorer(this).enableView());
+    });
   }
 
   async clearControllers() {

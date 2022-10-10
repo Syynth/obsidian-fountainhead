@@ -49,7 +49,7 @@ export function useWatchFile(
   useEffect(() => {
     if (path === null) return;
     async function filteredHandler(ev: TAbstractFile) {
-      if (ev.path === path) {
+      if (ev.path.toLowerCase() === path?.toLowerCase()) {
         handler(ev, await vault.adapter.read(ev.path));
       }
     }

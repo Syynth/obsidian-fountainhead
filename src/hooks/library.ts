@@ -115,7 +115,9 @@ export function useRecord({
         } else {
           const text = await vault.adapter.read(path);
           const files = vault.getMarkdownFiles();
-          const file = files.find(file => file.path === path);
+          const file = files.find(
+            file => file.path.toLowerCase() === path.toLowerCase(),
+          );
           console.log(
             'searching for',
             path,

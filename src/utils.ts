@@ -76,3 +76,25 @@ export function replaceFrontmatter(text: string, get: (current: any) => any) {
     .join('\n')
     .trim();
 }
+
+export function findTaggedCodeBlock(text: string, tag: string) {
+  const lines = text.trim().split('\n');
+  let started = false;
+  const codeBlock = [];
+  for (const line of lines) {
+    const delimiter = line.trim() === '```';
+
+    if (!started && delimiter && line.contains(tag)) {
+      started = true;
+      continue;
+    }
+    if (started && !delimiter) {
+      codeBlock.push(line);
+      continue;
+    }
+    if (started && delimiter) {
+      return codeBlock.join('\n');
+    }
+  }
+  return '';
+}

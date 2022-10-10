@@ -19,11 +19,14 @@ import { Notice, parseYaml, stringifyYaml, TAbstractFile } from 'obsidian';
 import { LibraryList } from '~/components/LibraryList';
 import { useCallback, useEffect, useState } from 'react';
 import { findFrontmatter, replaceFrontmatter } from '~/utils';
+import { useRecord } from '~/hooks/library';
 
 export function LibraryView() {
   const vault = useVault();
   const plugin = usePlugin();
   const [editing, setEditing] = useState<null | string>(null);
+
+  const { record, save } = useRecord('Character', editing);
 
   async function handleSubmit({ formData }: IChangeEvent) {
     const path =
@@ -164,7 +167,7 @@ ${stringifyYaml({
                 },
               }}
             >
-              <pre>Editing: {editing}</pre>
+              <pre>{JSON.stringify(record, null, 2)}</pre>
               <Form
                 onChange={handleChange}
                 formData={formData}

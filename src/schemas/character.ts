@@ -42,8 +42,6 @@ export const CharacterSchema: JSONSchema7 = {
         conflicts: logProperty('Conflicts'),
       },
     },
-
-    // timeline: logProperty('Timeline'),
   },
 };
 

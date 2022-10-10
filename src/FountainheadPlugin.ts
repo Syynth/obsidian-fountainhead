@@ -82,7 +82,8 @@ fountainhead:
   resource: Index
   type: ${collection}-Index
 ---
-\`\`\`json5
+## Record schema
+\`\`\`json5 data-schema
 {
   type: 'object',
   title: "${collection}",
@@ -93,7 +94,13 @@ fountainhead:
     },
   },
 }
-\`\`\``,
+\`\`\`
+
+## UI Schema
+\`\`\`json5 ui-schema
+{}
+\`\`\`
+`,
       );
     }
   }

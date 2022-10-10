@@ -55,7 +55,9 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
 
   function handleChange({ formData }: IChangeEvent) {
     setFormData(formData);
-    autoSave(formData);
+    if (record) {
+      autoSave(formData);
+    }
   }
 
   async function handleSubmit({ formData }: IChangeEvent) {

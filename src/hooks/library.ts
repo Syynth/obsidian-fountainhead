@@ -79,6 +79,20 @@ export function useRecord({
 
   useWatchFile(path, loadFile);
 
+  const saveNew = useCallback(
+    async (data: Record<string, any> | null) => {
+      if (data === null) return;
+      const target = `${dir}/${data.filename}.md`.replace('//', '/');
+      if (!(await vault.adapter.exists(target))) {
+        await createFile(vault, target, recordTemplate(type, data));
+        new Notice('Created new library item: ' + data.filename);
+      } else {
+        new Notice('A library with that name already exists');
+      }
+    },
+    [plugin, type],
+  );
+
   const save = useCallback(
     async (data: Record<string, any> | null) => {
       if (data === null) return;
@@ -121,11 +135,11 @@ export function useRecord({
         console.error(err);
       }
     },
-    [plugin, path, type, record],
+    [plugin, path, type, record, dir],
   );
 
   if (path === null) {
-    return { record: null, save: null };
+    return { record: null, save: saveNew };
   }
 
   return { record: record?.data ?? null, save };

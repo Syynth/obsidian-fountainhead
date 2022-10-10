@@ -47,7 +47,7 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
       (formData: Record<string, any> | null) => {
         save?.(formData);
       },
-      1000,
+      500,
       true,
     ),
     [save],
@@ -69,7 +69,7 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
 
   useEffect(() => {
     void startEditing(path);
-  }, [path, setPath]);
+  }, [path, resource]);
 
   return {
     formData,

@@ -109,7 +109,7 @@ export function useRecord({
             onPathChanged(target);
           }
         }
-        new Notice('Updated: ' + target);
+
         return true;
       } catch (err) {
         new Notice(

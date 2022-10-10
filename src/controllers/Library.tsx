@@ -1,7 +1,7 @@
 import { FountainheadPlugin } from '~/FountainheadPlugin';
 import { LIBRARY_VIEW_TYPE } from '~/constants';
 import { WorkspaceLeaf } from 'obsidian';
-import { LibraryView } from '~/components/LibraryView';
+import { LibraryView } from '~/components/Library/LibraryView';
 
 import { ReactItemView, ViewController } from './ReactItemView';
 

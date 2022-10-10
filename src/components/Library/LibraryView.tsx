@@ -1,6 +1,3 @@
-import validator from '@rjsf/validator-ajv6';
-import Form from '@rjsf/chakra-ui';
-import { CharacterSchema, CharacterUISchema } from '~/schemas/character';
 import {
   Button,
   Divider,
@@ -12,47 +9,12 @@ import {
   Tabs,
   VStack,
 } from '@chakra-ui/react';
-import { IChangeEvent } from '@rjsf/core';
-import { useVault } from '~/hooks/app';
-import { parseYaml } from 'obsidian';
-import { LibraryList } from '~/components/LibraryList';
-import { useEffect, useState } from 'react';
-import { findFrontmatter } from '~/utils';
-import { useRecord } from '~/hooks/library';
+import { Collection } from '~/components/Library/Collection';
+import { useState } from 'react';
+import { Editor } from '~/components/Library/Editor';
 
 export function LibraryView() {
-  const vault = useVault();
   const [path, setPath] = useState<null | string>(null);
-  const [formData, setFormData] = useState<any>();
-
-  const { record, save } = useRecord({
-    type: 'Characters',
-    path,
-    onPathChanged: startEditing,
-  });
-
-  useEffect(() => {
-    setFormData(record);
-  }, [record]);
-
-  async function handleSubmit({ formData }: IChangeEvent) {
-    await save?.(formData ?? {});
-  }
-
-  async function startEditing(next: null | string) {
-    if (next === null) {
-      setFormData(null);
-      setPath(null);
-      return;
-    }
-    const text = await vault.adapter.read(next);
-    setFormData(parseYaml(findFrontmatter(text))?.fountainhead?.data ?? {});
-    setPath(next);
-  }
-
-  function handleChange({ formData }: IChangeEvent) {
-    setFormData(formData);
-  }
 
   return (
     <Tabs isFitted variant="solid-rounded">
@@ -76,15 +38,15 @@ export function LibraryView() {
               <VStack spacing={4} align="stretch">
                 <Button
                   variant={path === null ? undefined : 'outline'}
-                  onClick={() => startEditing(null)}
+                  onClick={() => setPath(null)}
                   mt="auto"
                 >
                   Add New
                 </Button>
                 <Divider />
-                <LibraryList
+                <Collection
                   active={path}
-                  onSelect={startEditing}
+                  onSelect={setPath}
                   resource="Characters"
                 />
               </VStack>
@@ -106,14 +68,7 @@ export function LibraryView() {
                 },
               }}
             >
-              <Form
-                onChange={handleChange}
-                formData={formData}
-                schema={CharacterSchema}
-                uiSchema={CharacterUISchema}
-                validator={validator}
-                onSubmit={handleSubmit}
-              />
+              <Editor resource="Characters" path={path} setPath={setPath} />
             </VStack>
           </HStack>
         </TabPanel>

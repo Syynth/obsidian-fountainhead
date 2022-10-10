@@ -9,7 +9,7 @@ interface LibraryListProps {
   onSelect(path: string): void;
 }
 
-export function LibraryList({ resource, active, onSelect }: LibraryListProps) {
+export function Collection({ resource, active, onSelect }: LibraryListProps) {
   const { files, pending } = useCollection(resource);
   const [firstLoad, setFirstLoad] = useState(true);
 

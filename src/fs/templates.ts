@@ -23,7 +23,7 @@ fountainhead:
   type: 'object',
   title: "${resource}",
   properties: {
-    name: {
+    filename: {
       title: 'Record Name',
       type: 'string',
     },

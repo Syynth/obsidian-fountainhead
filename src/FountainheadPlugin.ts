@@ -1,11 +1,12 @@
-import { Plugin } from 'obsidian';
+import { addIcon, Plugin } from 'obsidian';
 import { FountainheadSettings } from '~/types';
-import { DEFAULT_SETTINGS } from '~/constants';
+import { DEFAULT_SETTINGS, PEN_ICON, PEN_ICON_NAME } from '~/constants';
 import { FountainheadSettingsTab } from '~/controllers/Settings';
 import { Library } from '~/controllers/Library';
 import { ViewController } from '~/controllers/ReactItemView';
 import { createFile, createFolder } from '~/fs/utils';
 import { schema } from '~/fs/templates';
+import { Explorer } from '~/controllers/Explorer';
 
 export class FountainheadPlugin extends Plugin {
   settings: FountainheadSettings;
@@ -24,12 +25,13 @@ export class FountainheadPlugin extends Plugin {
   }
 
   async initialize() {
+    addIcon(PEN_ICON_NAME, PEN_ICON);
     await this.clearControllers();
     this.settingsListeners.clear();
 
     // This creates an icon in the left ribbon.
     const ribbonIconEl = this.addRibbonIcon(
-      'highlight-glyph',
+      PEN_ICON_NAME,
       'Fountainhead',
       async () => {
         // Called when the user clicks the icon.
@@ -46,6 +48,7 @@ export class FountainheadPlugin extends Plugin {
     statusBarItemEl.setText('Parenthetical');
 
     this.controllers.push(new Library(this));
+    this.controllers.push(await new Explorer(this).activateView());
   }
 
   async clearControllers() {

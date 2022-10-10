@@ -29,7 +29,7 @@ export function LibraryView() {
             align="stretch"
             justify="space-between"
             spacing={4}
-            minW={64}
+            minW={48}
           >
             <VStack spacing={4} align="stretch">
               <Button

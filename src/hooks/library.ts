@@ -1,6 +1,6 @@
 import { Notice, parseYaml, Vault } from 'obsidian';
 import { useCallback, useEffect, useState } from 'react';
-import { createFile } from '~/fs/utils';
+import { createFile, normalize } from '~/fs/utils';
 import { record as recordTemplate } from '~/fs/templates';
 import { usePlugin, useVault } from '~/hooks/app';
 import { useFileEvent, useWatchFile } from '~/hooks/file';
@@ -15,12 +15,12 @@ import { UiSchema } from '@rjsf/chakra-ui';
 
 export function useLibraryDir(resource?: string, name?: string) {
   const { settings } = usePlugin();
-  return (
+  return normalize(
     settings.projectDirectory +
-    '/Library' +
-    (resource ? '/' + resource : '') +
-    (name ? '/' + name : '')
-  ).replace('//', '/');
+      '/Library' +
+      (resource ? '/' + resource : '') +
+      (name ? '/' + name : ''),
+  );
 }
 
 async function getResources(vault: Vault, dir: string) {
@@ -88,31 +88,44 @@ export function useRecord({
   useWatchFile(path, loadFile);
 
   const saveNew = useCallback(
-    async (data: Record<string, any> | null) => {
-      if (data === null) return;
-      const target = `${dir}/${data.filename}.md`.replace('//', '/');
+    async (data: Record<string, any> | null): Promise<string | null> => {
+      if (data === null) return null;
+      const target = normalize(`${dir}/${data.filename}.md`);
       if (!(await vault.adapter.exists(target))) {
         await createFile(vault, target, recordTemplate(type, data));
         new Notice('Created new library item: ' + data.filename);
+        return target;
       } else {
         new Notice('A library with that name already exists');
       }
+      return null;
     },
     [plugin, type],
   );
 
   const save = useCallback(
-    async (data: Record<string, any> | null) => {
-      if (data === null) return;
+    async (data: Record<string, any> | null): Promise<string | null> => {
+      if (data === null) return null;
       try {
-        const target = `${dir}/${data.filename}.md`.replace('//', '/');
+        const target = normalize(`${dir}/${data.filename}.md`);
         const changedPath = target !== path;
         if (path === null || !(await vault.adapter.exists(path))) {
           await createFile(vault, target, recordTemplate(type, data));
+          return target;
         } else {
           const text = await vault.adapter.read(path);
           const files = vault.getMarkdownFiles();
           const file = files.find(file => file.path === path);
+          console.log(
+            'searching for',
+            path,
+            'to modify, target is',
+            target,
+            'in',
+            files,
+            ', found',
+            file,
+          );
           await vault.modify(
             file!,
             replaceFrontmatter(text, fm => {
@@ -129,10 +142,13 @@ export function useRecord({
           if (changedPath && !exists) {
             await plugin.app.fileManager.renameFile(file!, target);
             onPathChanged(target);
+            console.log('moved', path, 'to', target);
+            return target;
+          } else {
+            console.log('did not move');
           }
+          return target;
         }
-
-        return true;
       } catch (err) {
         new Notice(
           'Fountainhead: An error occurred updating ' +
@@ -142,6 +158,7 @@ export function useRecord({
         );
         console.error(err);
       }
+      return null;
     },
     [plugin, path, type, record, dir],
   );

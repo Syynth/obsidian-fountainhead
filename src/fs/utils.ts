@@ -45,3 +45,7 @@ export function getOS() {
 
   return os;
 }
+
+export function normalize(path: string) {
+  return path.replace('//', '/').replace(/^\//gi, '');
+}

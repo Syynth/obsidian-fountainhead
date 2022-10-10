@@ -18,9 +18,11 @@ export class FountainheadPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     await this.initialize();
+    console.log('Fountainhead Plugin Initialized');
   }
 
   onunload() {
+    console.log('Unloading Fountainhead Plugin');
     super.onunload();
   }
 

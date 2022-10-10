@@ -93,7 +93,7 @@ export class FountainheadPlugin extends Plugin {
     for (const collection of this.settings.collections) {
       const dir = projectDirectory + '/Library/' + collection;
       await createFolder(vault, dir);
-      await createFile(vault, dir + '/0. Schema.md', schema(collection));
+      await createFile(vault, dir + '/_Schema.md', schema(collection));
     }
   }
 

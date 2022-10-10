@@ -1,6 +1,6 @@
 import { TAbstractFile } from 'obsidian';
 import { useVault } from '~/hooks/app';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function useFileEvent(
   handler: (ev: TAbstractFile) => void,
@@ -28,14 +28,29 @@ export function useFileEvent(
 
 export function useWatchFile(
   path: string | null,
-  handler: (ev: TAbstractFile) => void,
+  handler: (ev: TAbstractFile | null, contents: string) => void,
+  firstRun?: boolean,
 ) {
+  const hasFirstRun = useRef(!firstRun);
   const vault = useVault();
   useEffect(() => {
+    hasFirstRun.current = !firstRun;
+  }, [path]);
+  useEffect(() => {
+    (async () => {
+      if (!hasFirstRun.current && path) {
+        hasFirstRun.current = true;
+        if (await vault.adapter.exists(path)) {
+          handler(null, await vault.adapter.read(path));
+        }
+      }
+    })();
+  }, [hasFirstRun, path]);
+  useEffect(() => {
     if (path === null) return;
-    function filteredHandler(ev: TAbstractFile) {
+    async function filteredHandler(ev: TAbstractFile) {
       if (ev.path === path) {
-        handler(ev);
+        handler(ev, await vault.adapter.read(ev.path));
       }
     }
     vault.on('modify', filteredHandler);

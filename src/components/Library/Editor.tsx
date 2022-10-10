@@ -1,5 +1,4 @@
 import Form from '@rjsf/chakra-ui';
-import { CharacterSchema, CharacterUISchema } from '~/schemas/character';
 import validator from '@rjsf/validator-ajv6';
 import { VStack } from '@chakra-ui/react';
 import {
@@ -10,7 +9,7 @@ import {
   useState,
 } from 'react';
 import { IChangeEvent } from '@rjsf/core';
-import { useRecord } from '~/hooks/library';
+import { useRecord, useSchema } from '~/hooks/library';
 import { debounce, Notice, parseYaml } from 'obsidian';
 import { findFrontmatter } from '~/utils';
 import { useVault } from '~/hooks/app';
@@ -41,6 +40,8 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
     path,
     onPathChanged: startEditing,
   });
+
+  const { schema, uiSchema } = useSchema(resource);
 
   const autoSave = useCallback(
     debounce(
@@ -74,6 +75,8 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
   }, [path, resource]);
 
   return {
+    schema,
+    uiSchema,
     formData,
     handleChange,
     handleSubmit,
@@ -81,7 +84,8 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
 }
 
 export function Editor(props: UseEditorProps) {
-  const { formData, handleChange, handleSubmit } = useEditor(props);
+  const { schema, uiSchema, formData, handleChange, handleSubmit } =
+    useEditor(props);
 
   return (
     <VStack
@@ -101,14 +105,16 @@ export function Editor(props: UseEditorProps) {
         },
       }}
     >
-      <Form
-        onChange={handleChange}
-        formData={formData}
-        onSubmit={handleSubmit}
-        schema={CharacterSchema}
-        uiSchema={CharacterUISchema}
-        validator={validator}
-      />
+      {schema && (
+        <Form
+          onChange={handleChange}
+          formData={formData}
+          onSubmit={handleSubmit}
+          schema={schema}
+          uiSchema={uiSchema}
+          validator={validator}
+        />
+      )}
     </VStack>
   );
 }

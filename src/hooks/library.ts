@@ -4,14 +4,22 @@ import { createFile } from '~/fs/utils';
 import { record as recordTemplate } from '~/fs/templates';
 import { usePlugin, useVault } from '~/hooks/app';
 import { useFileEvent, useWatchFile } from '~/hooks/file';
-import { findFrontmatter, replaceFrontmatter } from '~/utils';
+import {
+  findFrontmatter,
+  findTaggedCodeBlock,
+  replaceFrontmatter,
+} from '~/utils';
+import { JSONSchema7 } from 'json-schema';
+import * as JSON5 from 'json5';
+import { UiSchema } from '@rjsf/chakra-ui';
 
-export function useLibraryDir(resource?: string) {
+export function useLibraryDir(resource?: string, name?: string) {
   const { settings } = usePlugin();
   return (
     settings.projectDirectory +
     '/Library' +
-    (resource ? '/' + resource : '')
+    (resource ? '/' + resource : '') +
+    (name ? '/' + name : '')
   ).replace('//', '/');
 }
 
@@ -146,5 +154,17 @@ export function useRecord({
 }
 
 export function useSchema(type: string) {
-  const dir = useLibraryDir(type);
+  const path = useLibraryDir(type, '_Schema.md');
+  const [schema, setSchema] = useState<JSONSchema7 | null>(null);
+  const [uiSchema, setUiSchema] = useState<UiSchema | undefined>();
+  useWatchFile(
+    path,
+    (ev, contents) => {
+      setSchema(JSON5.parse(findTaggedCodeBlock(contents, 'data-schema')));
+      setUiSchema(JSON5.parse(findTaggedCodeBlock(contents, 'ui-schema')));
+    },
+    true,
+  );
+
+  return { schema, uiSchema };
 }

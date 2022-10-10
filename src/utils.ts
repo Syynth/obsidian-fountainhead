@@ -82,7 +82,7 @@ export function findTaggedCodeBlock(text: string, tag: string) {
   let started = false;
   const codeBlock = [];
   for (const line of lines) {
-    const delimiter = line.trim() === '```';
+    const delimiter = line.trim().contains('```');
 
     if (!started && delimiter && line.contains(tag)) {
       started = true;

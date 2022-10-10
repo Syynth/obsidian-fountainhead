@@ -1,9 +1,10 @@
-import { usePlugin, useVault } from '~/hooks/app';
+import { Notice, parseYaml, Vault } from 'obsidian';
 import { useCallback, useEffect, useState } from 'react';
-import { Notice, parseYaml, stringifyYaml, Vault } from 'obsidian';
-import { findFrontmatter, replaceFrontmatter } from '~/utils';
 import { createFile } from '~/fs/utils';
+import { record as recordTemplate } from '~/fs/templates';
+import { usePlugin, useVault } from '~/hooks/app';
 import { useFileEvent, useWatchFile } from '~/hooks/file';
+import { findFrontmatter, replaceFrontmatter } from '~/utils';
 
 export function useLibraryDir(resource?: string) {
   const { settings } = usePlugin();
@@ -50,7 +51,15 @@ export function useCollection(type: string) {
   };
 }
 
-export function useRecord(type: string, path: string | null) {
+export function useRecord({
+  type,
+  path,
+  onPathChanged,
+}: {
+  type: string;
+  path: string | null;
+  onPathChanged: (path: string) => void;
+}) {
   const vault = useVault();
   const plugin = usePlugin();
   const dir = useLibraryDir(type);
@@ -58,7 +67,8 @@ export function useRecord(type: string, path: string | null) {
 
   const loadFile = useCallback(async () => {
     const text = await vault.adapter.read(path!);
-    setRecord(parseYaml(findFrontmatter(text))?.fountainhead ?? null);
+    const nextRecord = parseYaml(findFrontmatter(text))?.fountainhead ?? null;
+    setRecord(nextRecord);
   }, [path]);
 
   useEffect(() => {
@@ -70,22 +80,13 @@ export function useRecord(type: string, path: string | null) {
   useWatchFile(path, loadFile);
 
   const save = useCallback(
-    async (data: Record<string, any>) => {
+    async (data: Record<string, any> | null) => {
+      if (data === null) return;
       try {
         const target = `${dir}/${data.filename}.md`.replace('//', '/');
         const changedPath = target !== path;
         if (path === null || !(await vault.adapter.exists(path))) {
-          await createFile(
-            vault,
-            target,
-            `---
-${stringifyYaml({
-  fountainhead: {
-    resource: type,
-    data,
-  },
-})}---`,
-          );
+          await createFile(vault, target, recordTemplate(type, data));
         } else {
           const text = await vault.adapter.read(path);
           const files = vault.getMarkdownFiles();
@@ -102,13 +103,21 @@ ${stringifyYaml({
               };
             }),
           );
-          if (changedPath && !(await vault.adapter.exists(target))) {
-            await plugin.app.fileManager.renameFile(file!, path);
+          const exists = await vault.adapter.exists(target);
+          if (changedPath && !exists) {
+            await plugin.app.fileManager.renameFile(file!, target);
+            onPathChanged(target);
           }
         }
         new Notice('Updated: ' + target);
         return true;
       } catch (err) {
+        new Notice(
+          'Fountainhead: An error occurred updating ' +
+            type +
+            '.\n' +
+            err.message,
+        );
         console.error(err);
       }
     },
@@ -120,4 +129,8 @@ ${stringifyYaml({
   }
 
   return { record: record?.data ?? null, save };
+}
+
+export function useSchema(type: string) {
+  const dir = useLibraryDir(type);
 }

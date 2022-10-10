@@ -1,10 +1,9 @@
 import { JSONSchema7 } from 'json-schema';
-import { logProperty, versionProperty } from '~/schemas/utils';
 
 export const CharacterSchema: JSONSchema7 = {
   type: 'object',
   properties: {
-    name: {
+    filename: {
       title: 'Record Name',
       type: 'string',
     },
@@ -28,18 +27,94 @@ export const CharacterSchema: JSONSchema7 = {
           type: 'string',
           title: 'Birthday',
         },
-        bio: versionProperty('Bio'),
-        history: versionProperty('History'),
+        bio: {
+          type: 'array',
+          title: 'Bio',
+          items: {
+            type: 'string',
+          },
+        },
+        history: {
+          type: 'array',
+          title: 'History',
+          items: {
+            type: 'string',
+          },
+        },
       },
     },
     suspectNotes: {
       title: 'Suspect Notes',
       type: 'object',
       properties: {
-        motivation: logProperty('Motivation'),
-        loss: logProperty('Loss'),
-        alibi: logProperty('Alibi'),
-        conflicts: logProperty('Conflicts'),
+        motivation: {
+          type: 'array',
+          title: 'Motivation',
+          items: {
+            type: 'object',
+            properties: {
+              overwritePrevious: {
+                type: 'boolean',
+                title: 'Replace previous entries?',
+              },
+              summary: {
+                type: 'string',
+                title: 'Summary',
+              },
+            },
+          },
+        },
+        loss: {
+          type: 'array',
+          title: 'Loss',
+          items: {
+            type: 'object',
+            properties: {
+              overwritePrevious: {
+                type: 'boolean',
+                title: 'Replace previous entries?',
+              },
+              summary: {
+                type: 'string',
+                title: 'Summary',
+              },
+            },
+          },
+        },
+        alibi: {
+          type: 'array',
+          title: 'Alibi',
+          items: {
+            type: 'object',
+            properties: {
+              overwritePrevious: {
+                type: 'boolean',
+                title: 'Replace previous entries?',
+              },
+              summary: {
+                type: 'string',
+                title: 'Summary',
+              },
+            },
+          },
+        },
+        conflicts: {
+          type: 'array',
+          title: 'Conflicts',
+          items: {
+            type: 'object',
+            properties: {
+              overwritePrevious: {
+                type: 'boolean',
+                title: 'Replace previous entries?',
+              },
+              summary: {
+                type: 'string',
+                title: 'Summary',
+              },
+            },
+          },
+        },
       },
     },
   },

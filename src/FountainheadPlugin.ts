@@ -5,6 +5,7 @@ import { FountainheadSettingsTab } from '~/controllers/Settings';
 import { Library } from '~/controllers/Library';
 import { ViewController } from '~/controllers/ReactItemView';
 import { createFile, createFolder } from '~/fs/utils';
+import { schema } from '~/fs/templates';
 
 export class FountainheadPlugin extends Plugin {
   settings: FountainheadSettings;
@@ -73,35 +74,7 @@ export class FountainheadPlugin extends Plugin {
     for (const collection of this.settings.collections) {
       const dir = projectDirectory + '/Library/' + collection;
       await createFolder(vault, dir);
-      await createFile(
-        vault,
-        dir + '/0. Schema.md',
-        `---
-tags: [library-index]
-fountainhead:
-  resource: Index
-  type: ${collection}-Index
----
-## Record schema
-\`\`\`json5 data-schema
-{
-  type: 'object',
-  title: "${collection}",
-  properties: {
-    name: {
-      title: 'Record Name',
-      type: 'string',
-    },
-  },
-}
-\`\`\`
-
-## UI Schema
-\`\`\`json5 ui-schema
-{}
-\`\`\`
-`,
-      );
+      await createFile(vault, dir + '/0. Schema.md', schema(collection));
     }
   }
 

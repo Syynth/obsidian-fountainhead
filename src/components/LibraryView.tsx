@@ -13,105 +13,44 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { IChangeEvent } from '@rjsf/core';
-import { usePlugin, useVault } from '~/hooks/app';
-import { createFile } from '~/fs/utils';
-import { Notice, parseYaml, stringifyYaml, TAbstractFile } from 'obsidian';
+import { useVault } from '~/hooks/app';
+import { parseYaml } from 'obsidian';
 import { LibraryList } from '~/components/LibraryList';
-import { useCallback, useEffect, useState } from 'react';
-import { findFrontmatter, replaceFrontmatter } from '~/utils';
+import { useEffect, useState } from 'react';
+import { findFrontmatter } from '~/utils';
 import { useRecord } from '~/hooks/library';
 
 export function LibraryView() {
   const vault = useVault();
-  const plugin = usePlugin();
-  const [editing, setEditing] = useState<null | string>(null);
+  const [path, setPath] = useState<null | string>(null);
+  const [formData, setFormData] = useState<any>();
 
-  const { record, save } = useRecord('Character', editing);
-
-  async function handleSubmit({ formData }: IChangeEvent) {
-    const path =
-      `${plugin.settings.projectDirectory}/Library/Characters/${formData.details.fullName}.md`.replace(
-        '//',
-        '/',
-      );
-    if (!editing) {
-      await createFile(
-        vault,
-        path,
-        `---
-${stringifyYaml({
-  fountainhead: {
-    resource: 'Character',
-    data: formData,
-  },
-})}---`,
-      );
-    } else {
-      const text = await vault.adapter.read(editing);
-      const files = vault.getMarkdownFiles();
-      const file = files.find(file => file.path === editing);
-      let hasNameChange = false;
-      await vault.modify(
-        file!,
-        replaceFrontmatter(text, fm => {
-          const name = fm?.fountainhead?.data?.details?.fullName;
-          if (formData.details.fullName !== name) {
-            hasNameChange = true;
-          }
-          return {
-            ...fm,
-            fountainhead: {
-              ...fm?.fountainhead,
-              data: formData,
-            },
-          };
-        }),
-        {},
-      );
-      if (hasNameChange && !(await vault.adapter.exists(path))) {
-        await plugin.app.fileManager.renameFile(file!, path);
-        setEditing(path);
-      }
-      new Notice('Updated record');
-    }
-  }
-
-  const loadFile = useCallback(
-    async (path: string) => {
-      const text = await vault.adapter.read(path);
-      setFormData(parseYaml(findFrontmatter(text))?.fountainhead?.data ?? {});
-      setEditing(path);
-    },
-    [vault],
-  );
+  const { record, save } = useRecord({
+    type: 'Characters',
+    path,
+    onPathChanged: startEditing,
+  });
 
   useEffect(() => {
-    async function handler(file: TAbstractFile) {
-      if (editing === file.path) {
-        await loadFile(file.path);
-      }
-    }
+    setFormData(record);
+  }, [record]);
 
-    vault.on('modify', handler);
-    return () => {
-      vault.off('modify', handler);
-    };
-  }, [vault, loadFile, editing]);
+  async function handleSubmit({ formData }: IChangeEvent) {
+    await save?.(formData ?? {});
+  }
 
   async function startEditing(next: null | string) {
     if (next === null) {
       setFormData(null);
-      setEditing(null);
+      setPath(null);
       return;
     }
     const text = await vault.adapter.read(next);
     setFormData(parseYaml(findFrontmatter(text))?.fountainhead?.data ?? {});
-    setEditing(next);
+    setPath(next);
   }
 
-  const [formData, setFormData] = useState<any>();
-
-  function handleChange({ formData }: IChangeEvent<any, any>) {
+  function handleChange({ formData }: IChangeEvent) {
     setFormData(formData);
   }
 
@@ -136,7 +75,7 @@ ${stringifyYaml({
             >
               <VStack spacing={4} align="stretch">
                 <Button
-                  variant={editing === null ? undefined : 'outline'}
+                  variant={path === null ? undefined : 'outline'}
                   onClick={() => startEditing(null)}
                   mt="auto"
                 >
@@ -144,7 +83,7 @@ ${stringifyYaml({
                 </Button>
                 <Divider />
                 <LibraryList
-                  active={editing}
+                  active={path}
                   onSelect={startEditing}
                   resource="Characters"
                 />
@@ -167,7 +106,6 @@ ${stringifyYaml({
                 },
               }}
             >
-              <pre>{JSON.stringify(record, null, 2)}</pre>
               <Form
                 onChange={handleChange}
                 formData={formData}

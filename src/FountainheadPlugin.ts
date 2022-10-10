@@ -3,6 +3,7 @@ import { FountainheadSettings } from '~/types';
 import { DEFAULT_SETTINGS, PEN_ICON, PEN_ICON_NAME } from '~/constants';
 import { FountainheadSettingsTab } from '~/controllers/Settings';
 import { Library } from '~/controllers/Library';
+import { Explorer } from '~/controllers/Explorer';
 import { ViewController } from '~/controllers/ReactItemView';
 import { createFile, createFolder } from '~/fs/utils';
 import { schema } from '~/fs/templates';
@@ -47,7 +48,7 @@ export class FountainheadPlugin extends Plugin {
     statusBarItemEl.setText('Parenthetical');
 
     this.controllers.push(new Library(this));
-    // this.controllers.push(await new Explorer(this).activateView());
+    this.controllers.push(await new Explorer(this).activateView());
   }
 
   async clearControllers() {

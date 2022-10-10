@@ -11,6 +11,9 @@ export class FountainheadPlugin extends Plugin {
   settings: FountainheadSettings;
   controllers: ViewController<any>[] = [];
 
+  private settingsListeners: Set<(arg: FountainheadSettings) => void> =
+    new Set();
+
   async onload() {
     await this.loadSettings();
     await this.initialize();
@@ -22,6 +25,7 @@ export class FountainheadPlugin extends Plugin {
 
   async initialize() {
     await this.clearControllers();
+    this.settingsListeners.clear();
 
     // This creates an icon in the left ribbon.
     const ribbonIconEl = this.addRibbonIcon(
@@ -58,10 +62,25 @@ export class FountainheadPlugin extends Plugin {
     this.settings.collections =
       this.settings.collections?.filter(str => str) ?? [];
     this.addSettingTab(new FountainheadSettingsTab(this.app, this));
+
+    for (const listener of this.settingsListeners) {
+      listener?.(this.settings);
+    }
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
+    for (const listener of this.settingsListeners) {
+      listener?.(this.settings);
+    }
+  }
+
+  addSettingsListener(listener: (arg: FountainheadSettings) => void) {
+    this.settingsListeners.add(listener);
+  }
+
+  removeSettingsListener(listener: (arg: FountainheadSettings) => void) {
+    this.settingsListeners.delete(listener);
   }
 
   async createLibrary() {

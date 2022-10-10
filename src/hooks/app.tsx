@@ -1,6 +1,13 @@
-import { createContext, ReactElement, useContext } from 'react';
+import {
+  createContext,
+  ReactElement,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { FountainheadPlugin } from '~/FountainheadPlugin';
 import { App } from 'obsidian';
+import { FountainheadSettings } from '~/types';
 
 interface AppContext {
   app: App;
@@ -33,4 +40,22 @@ export function usePlugin() {
 
 export function useVault() {
   return usePlugin().app.vault;
+}
+
+export function useSettings() {
+  const plugin = usePlugin();
+  const [settings, setSettings] = useState(plugin.settings);
+
+  useEffect(() => {
+    plugin.addSettingsListener(setSettings);
+    return () => plugin.removeSettingsListener(setSettings);
+  }, [plugin]);
+
+  return {
+    settings,
+    saveSettings: async (settings: FountainheadSettings) => {
+      plugin.settings = settings;
+      await plugin.saveSettings();
+    },
+  };
 }

@@ -4,7 +4,7 @@ import { prettyName } from '~/fs/utils';
 import { useCollection } from '~/hooks/library';
 
 interface LibraryListProps {
-  resource: 'Characters';
+  resource: string;
   active: string | null;
   onSelect(path: string): void;
 }

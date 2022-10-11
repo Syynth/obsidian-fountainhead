@@ -69,7 +69,9 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
       setFormData({});
     }
     await save?.(formData ?? {});
-    new Notice('Updated: ' + path);
+    if (path !== null) {
+      new Notice('Updated: ' + path);
+    }
   }
 
   useEffect(() => {

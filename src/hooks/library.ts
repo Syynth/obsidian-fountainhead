@@ -118,16 +118,6 @@ export function useRecord({
           const file = files.find(
             file => file.path.toLowerCase() === path.toLowerCase(),
           );
-          console.log(
-            'searching for',
-            path,
-            'to modify, target is',
-            target,
-            'in',
-            files,
-            ', found',
-            file,
-          );
           await vault.modify(
             file!,
             replaceFrontmatter(text, fm => {
@@ -144,10 +134,7 @@ export function useRecord({
           if (changedPath && !exists) {
             await plugin.app.fileManager.renameFile(file!, target);
             onPathChanged(target);
-            console.log('moved', path, 'to', target);
             return target;
-          } else {
-            console.log('did not move');
           }
           return target;
         }

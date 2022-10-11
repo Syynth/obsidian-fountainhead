@@ -46,9 +46,7 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
   const autoSave = useCallback(
     debounce(
       async (formData: Record<string, any> | null) => {
-        console.log('autosaving', formData, path);
         const targetPath = (await save?.(formData)) ?? null;
-        console.log('autosaved to', targetPath);
         setPath(targetPath);
       },
       500,
@@ -93,7 +91,7 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
 }
 
 export function Editor(props: UseEditorProps) {
-  const { record, schema, uiSchema, formData, handleChange, handleSubmit } =
+  const { schema, uiSchema, formData, handleChange, handleSubmit } =
     useEditor(props);
 
   return (
@@ -114,9 +112,6 @@ export function Editor(props: UseEditorProps) {
         },
       }}
     >
-      <pre>{props.path}</pre>
-      <pre>{JSON.stringify(record, null, 2)}</pre>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
       {schema && (
         <Form
           onChange={handleChange}

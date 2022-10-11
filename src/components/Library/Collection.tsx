@@ -30,7 +30,9 @@ export function Collection({ resource, active, onSelect }: LibraryListProps) {
     <>
       {files.map(item => (
         <Button
-          variant={item === active ? undefined : 'outline'}
+          variant={
+            item.toLowerCase() === active?.toLowerCase() ? undefined : 'outline'
+          }
           onClick={() => onSelect(item)}
           key={item}
         >

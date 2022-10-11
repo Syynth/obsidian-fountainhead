@@ -45,8 +45,9 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
 
   const autoSave = useCallback(
     debounce(
-      (formData: Record<string, any> | null) => {
-        save?.(formData);
+      async (formData: Record<string, any> | null) => {
+        const targetPath = (await save?.(formData)) ?? null;
+        setPath(targetPath);
       },
       500,
       true,
@@ -62,8 +63,13 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
   }
 
   async function handleSubmit({ formData }: IChangeEvent) {
+    if (record === null && path === null) {
+      setFormData({});
+    }
     await save?.(formData ?? {});
-    new Notice('Updated: ' + path);
+    if (path !== null) {
+      new Notice('Updated: ' + path);
+    }
   }
 
   useEffect(() => {
@@ -75,6 +81,7 @@ function useEditor({ path, setPath, resource }: UseEditorProps) {
   }, [path, resource]);
 
   return {
+    record,
     schema,
     uiSchema,
     formData,
